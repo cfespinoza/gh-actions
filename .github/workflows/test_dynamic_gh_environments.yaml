@@ -9,6 +9,9 @@ jobs:
   read-environment:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
       - name: Export Environment
         id: export-environment
         run: | 
