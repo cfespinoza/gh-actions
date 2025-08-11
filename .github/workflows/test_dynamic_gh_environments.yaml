@@ -1,0 +1,35 @@
+name: Testing Dynamic GitHub Environments
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  read-environment:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Export Environment
+        id: export-environment
+        run: | 
+          environment=$(cat dynamic_github_environments/environment)
+          echo "env_name=$environment" >> "$GITHUB_OUTPUT"
+    outputs:
+      environment: ${{ steps.export-environment.outputs.env_name }}
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: read-environment
+    environment: ${{ needs.read-environment.outputs.environment }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Deploy to Environment
+        run: |
+          echo "Deploying to environment: ${{ needs.read-environment.outputs.environment }}"
+          echo "${{ secrets.DEPLOYMENT_SECRET }}" > deploy_secret
+          cat deploy_secret
+          echo "${{ vars.DEPLOYMENT_VAR }}" >> deploy_var
+          cat deploy_var
+            # Add your deployment commands here
